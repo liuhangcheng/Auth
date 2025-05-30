@@ -24,13 +24,29 @@ app.use(session({
     cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
 }));
 
-// In-memory user storage (use a database in production)
+// In-memory storage (use a database in production)
 const users = new Map();
+const companies = new Map();
+
+// Initialize companies
+companies.set('tax-dept', {
+    id: 'tax-dept',
+    name: 'Tax department',
+    description: 'Government tax authority',
+    color: '#28a745'
+});
+
+companies.set('insurance-company', {
+    id: 'insurance-company',
+    name: 'Insurance company',
+    description: 'Insurance services provider',
+    color: '#007bff'
+});
 
 // Sample users for testing
 const sampleUsers = [
-    { username: 'admin', password: 'password123' },
-    { username: 'user1', password: 'mypassword' }
+    { username: 'admin', password: 'password123', companyId: 'tax-dept' },
+    { username: 'user1', password: 'mypassword', companyId: 'insurance-company' }
 ];
 
 // Initialize sample users with hashed passwords
@@ -38,15 +54,16 @@ const sampleUsers = [
     for (const user of sampleUsers) {
         const hashedPassword = await bcrypt.hash(user.password, 10);
         const secret = speakeasy.generateSecret({
-            name: `TimeKey (${user.username})`,
-            issuer: 'TimeKey System'
+            name: `Agent Auth (${user.username})`,
+            issuer: 'Agent Auth System'
         });
         
         users.set(user.username, {
             username: user.username,
             password: hashedPassword,
             secret: secret.base32,
-            secretUrl: secret.otpauth_url
+            secretUrl: secret.otpauth_url,
+            companyId: user.companyId
         });
     }
 })();
@@ -78,9 +95,12 @@ app.post('/login', async (req, res) => {
     
     const user = users.get(username);
     if (user && await bcrypt.compare(password, user.password)) {
+        const userCompany = companies.get(user.companyId);
         req.session.user = {
             username: user.username,
-            secret: user.secret
+            secret: user.secret,
+            companyId: user.companyId,
+            company: userCompany
         };
         res.redirect('/dashboard');
     } else {
@@ -116,6 +136,11 @@ app.get('/dashboard', requireAuth, async (req, res) => {
             timeRemaining: 30 - Math.floor((Date.now() / 1000) % 30)
         });
     }
+});
+
+app.get('/companies', (req, res) => {
+    const companiesList = Array.from(companies.values());
+    res.render('companies', { companies: companiesList, user: req.session.user });
 });
 
 app.get('/verify', (req, res) => {
@@ -155,10 +180,13 @@ app.post('/verify', (req, res) => {
         time: Date.now() / 1000
     });
     
+    const userCompany = companies.get(user.companyId);
+    
     res.render('verify', { 
         result: { 
             success: isValid, 
-            message: isValid ? 'Token is valid!' : 'Invalid token or token has expired' 
+            message: isValid ? 'Token is valid!' : 'Invalid token or token has expired',
+            user: isValid ? { username: user.username, company: userCompany } : null
         } 
     });
 });
@@ -178,6 +206,11 @@ app.get('/api/current-token', requireAuth, (req, res) => {
     });
 });
 
+app.get('/api/companies', (req, res) => {
+    const companiesList = Array.from(companies.values());
+    res.json(companiesList);
+});
+
 app.post('/logout', (req, res) => {
     req.session.destroy();
     res.redirect('/');
@@ -186,6 +219,10 @@ app.post('/logout', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     console.log('\nSample users for testing:');
-    console.log('Username: admin, Password: password123');
-    console.log('Username: user1, Password: mypassword');
+    console.log('Username: admin, Password: password123 (Tax department)');
+    console.log('Username: user1, Password: mypassword (Insurance company)');
+    console.log('\nCompanies available:');
+    companies.forEach(company => {
+        console.log(`- ${company.name}: ${company.description}`);
+    });
 }); 

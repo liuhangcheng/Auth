@@ -1,4 +1,4 @@
-# Setup Instructions for TimeKey System
+# Setup Instructions for Agent Auth System
 
 ## Prerequisites
 
@@ -21,7 +21,7 @@
    npm --version
    ```
 
-## Running the TimeKey System
+## Running the Agent Auth System
 
 ### Option 1: Using PowerShell/Command Prompt
 
@@ -57,15 +57,16 @@
 
 Once the server is running, you can login with these demo accounts:
 
-- **Username**: `admin` **Password**: `password123`
-- **Username**: `user1` **Password**: `mypassword`
+- **Username**: `admin` **Password**: `password123` (Tax department)
+- **Username**: `user1` **Password**: `mypassword` (Insurance company)
 
 ## What You'll See
 
 1. **Home Page**: Welcome page with navigation options
-2. **Login Page**: Authentication form
-3. **Dashboard**: Shows your current time-based key (changes every 30 seconds)
-4. **Verify Page**: Public page to verify anyone's key
+2. **Companies Page**: List of organizations using the system
+3. **Login Page**: Authentication form
+4. **Dashboard**: Shows your current time-based key (changes every 30 seconds)
+5. **Verify Page**: Public page to verify anyone's key
 
 ## Troubleshooting
 
@@ -90,10 +91,10 @@ pv/
 ├── server.js              # Main server file
 ├── package.json           # Dependencies and scripts
 ├── views/                 # EJS templates
-│   ├── layout.ejs        # Base layout
+│   ├── dashboard.ejs     # User dashboard
+│   ├── companies.ejs     # Companies listing
 │   ├── index.ejs         # Home page
 │   ├── login.ejs         # Login page
-│   ├── dashboard.ejs     # User dashboard
 │   └── verify.ejs        # Verification page
 ├── README.md             # Main documentation
 └── SETUP_INSTRUCTIONS.md # This file
@@ -104,9 +105,10 @@ pv/
 After getting the system running:
 
 1. **Test the login** with demo accounts
-2. **View your time-based key** on the dashboard
-3. **Test verification** by copying a key and verifying it
-4. **Watch the key change** every 30 seconds
+2. **View companies** on the companies page
+3. **View your time-based key** on the dashboard
+4. **Test verification** by copying a key and verifying it
+5. **Watch the key change** every 30 seconds
 
 ## Development Mode
 

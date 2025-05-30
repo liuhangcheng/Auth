@@ -1,7 +1,7 @@
 {
-  "name": "time-based-key-system",
+  "name": "agent-auth-system",
   "version": "1.0.0",
-  "description": "A website for generating and verifying time-based keys",
+  "description": "A website for generating and verifying time-based authentication keys for agents",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
@@ -20,7 +20,7 @@
   "devDependencies": {
     "nodemon": "^3.0.2"
   },
-  "keywords": ["totp", "authentication", "time-based", "security"],
+  "keywords": ["totp", "authentication", "time-based", "security", "agent", "auth"],
   "author": "",
   "license": "MIT"
 } 
